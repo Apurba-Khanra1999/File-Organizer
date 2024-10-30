@@ -12,9 +12,12 @@ def organize_files_by_extension(input_folder, output_folder):
         os.makedirs(output_folder)
 
     extension_map = {
-        'images': ['.jpg', '.jpeg', '.png', '.gif'],
-        'videos': ['.mp4', '.avi', '.mov'],
-        'documents': ['.pdf', '.docx', '.txt'],
+        'images': ['.jpg', '.jpeg', '.png', '.gif', '.HEIC', '.HEIF', '.DMG'],
+        'audio': ['.mp3', '.aac', '.ogg', '.m4a'],
+        'videos': ['.mp4', '.avi', '.mov', '.MOV'],
+        'documents': ['.pdf', '.docx', '.txt', '.doc'],
+        'adobe': ['.psd', '.psb', '.pdd', '.pdb', '.ai', '.eps', '.indd', '.indt', '.inx', '.prproj', '.aep', '.xd',
+                  '.lrtemplate', '.lrdevelop', '.lrpreset', '.aax'],
         # Add other extensions as needed
     }
 
@@ -42,13 +45,19 @@ st.write("Upload a zip file of your folder, and the app will organize files into
 
 uploaded_file = st.file_uploader("Upload Folder (Zip file)", type="zip")
 if uploaded_file:
-    # Step 3: Extract and organize
+    # Step 3: Extract and count files
     with zipfile.ZipFile(uploaded_file, 'r') as zip_ref:
         zip_ref.extractall("uploaded_folder")
+
+    # Count the number of files in the extracted folder
+    total_files = sum(len(files) for _, _, files in os.walk("uploaded_folder"))
+    st.write(f"Total number of files: {total_files}")
 
     # Add timestamp to output directory name
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = f"organized_folder_{timestamp}"
+
+    # Organize files
     organize_files_by_extension("uploaded_folder", output_dir)
 
     # Rezip the organized folder for download
